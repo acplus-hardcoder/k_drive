@@ -373,7 +373,9 @@ $(document).ready(function() {
 	    for (var i = 0; i < checkedNodes.length; i++) {
 	    	dataItem = treeview2.dataSource.get(checkedNodes[i]);
 	    	console.log(dataItem.filename + ":" + dataItem.dbfilename);
+	    	console.log(dataItem.filename + ":" + dataItem.dbfilename);
 	    	location.href = "/k_drive/down?filename="+dataItem.filename+"&dbname="+dataItem.dbfilename+"&table=" + user_num;
+	    		    	
 	    	/*$.get("http://10.0.0.46:8080/k_drive/down?filename=" + dataItem.filename + 
 	 			   "&dbname=" + dataItem.dbfilename + "&table=" + user_num, function(e) {
 	    		console.log("down success");	    				 		
