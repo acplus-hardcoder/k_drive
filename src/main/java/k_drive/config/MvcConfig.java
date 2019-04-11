@@ -30,7 +30,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @MapperScan(basePackages = { "k_drive.maps" })
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-	static HikariConfig config = new HikariConfig();
+	static HikariConfig config = new HikariConfig(); // 히카리CP 설정
 	static HikariDataSource ds;
 	static SqlSessionFactoryBean sqlSessionFactory;
 	static {
@@ -63,7 +63,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public TilesConfigurer tilesConfigurer() {
+	public TilesConfigurer tilesConfigurer() { // 타일스 설정
 		TilesConfigurer tilesConfigurer = new TilesConfigurer();		
 		tilesConfigurer.setDefinitions(new String[] { "/WEB-INF/views/**/tiles.xml" });
 		tilesConfigurer.setCheckRefresh(true);
@@ -77,19 +77,19 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
+	public void addInterceptors(InterceptorRegistry registry) { // 인터셉터 설정
 		registry.addInterceptor(new SystemIc())
 		.addPathPatterns("/web_hard","/web_hard/*");
 	}
 
 	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	public void addResourceHandlers(ResourceHandlerRegistry registry) { // 리소스폴더 설정
 		registry.addResourceHandler("/static/**").addResourceLocations("/static/");
 		registry.addResourceHandler("/img/**").addResourceLocations("/static/img/");
 	}
 	
 	@Bean
-	public MultipartResolver multipartResolver() {
+	public MultipartResolver multipartResolver() { // 파일작업 설정
 		CommonsMultipartResolver resolver = new CommonsMultipartResolver();
 		resolver.setMaxInMemorySize(100000000);
 		resolver.setMaxUploadSize(200000000);

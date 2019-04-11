@@ -23,7 +23,7 @@ public class WebConfig extends AbstractAnnotationConfigDispatcherServletInitiali
 	}
 
 	@Override
-	protected Filter[] getServletFilters() {
+	protected Filter[] getServletFilters() { // 인코딩 설정
 		CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
 		encodingFilter.setEncoding("UTF-8");
 		return new Filter[] { encodingFilter };

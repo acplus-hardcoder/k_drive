@@ -65,15 +65,15 @@ public class Rest {
 		List<FolderBean> fb_list = new ArrayList<>();		
 		int addIndex = 0;		
 		boolean path_flag = true;		
-		System.out.println(target + ":" + table + ":" + dir[0]);
 		
+		// 업로드 할 폴더의 트리구조를 조회하여 생성
 		for(int i = 0; i < dir.length; i++)
 		{			
-			String[] str = dir[i].split("/");						
-			String path = String.valueOf(target) + "/";
+			String[] str = dir[i].split("/"); // 폴더 패스 파싱					
+			String path = String.valueOf(target) + "/"; // 맨처음위치는 업로드할 폴더 순번
 						
 			for(int j = 0; j < str.length-1; j++)
-			{	
+			{ // 폴더의 중간 경로를 생성(폴더에 파일이 없으면 작업 할 수 없기 때문)
 				path += str[j] + "/";
 				for(FolderBean fi : fb_list)
 				{
@@ -105,7 +105,7 @@ public class Rest {
 		int first_sequence_num = 1000000000;
 		
 		for(FolderBean f : fb_list)
-		{	
+		{ // 폴더의 경로를 데이터베이스에 생성하고 순번을 저장(저장된 순번은 부모폴더 넘버로 사용)
 			String[] str = f.getPath().split("/");
 			String path = "";
 			for(int i = 0; i < str.length-1; i++)

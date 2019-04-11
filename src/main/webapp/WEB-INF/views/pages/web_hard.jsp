@@ -38,6 +38,7 @@
 
 <script>
 $(document).ready(function() {	
+	// kendo UI TreeView 생성
 	var treeview = $("#treeview-left").kendoTreeView({
 	    dragAndDrop: true,
 	    autoScroll: true,
@@ -54,7 +55,8 @@ $(document).ready(function() {
 	    autoScroll: true,	    
 	    loadOnDemand: false
     }).data("kendoTreeView");
-			
+	
+	// 로그인된 유저의 아이디와 순번을 얻는다
 	var lst = <%= request.getAttribute("klist") %>;
 	var user_num = <%= request.getAttribute("user_num") %>;
 	var user_name = '<%= request.getAttribute("user_name") %>';
@@ -63,10 +65,11 @@ $(document).ready(function() {
 		'<span class="glyphicon glyphicon-log-in"></span>' + user_name + ' Logout</a>');	
 	var dataItem, element, str, array;	
 
+	// 데이터 베이스에서 폴더구조를 얻어서 트리생성을 위한 데이터를 만든다
 	var json = new Array();
 	make_json("", json, lst);
 	
-	function make_json(id, object, source) {		
+	function make_json(id, object, source) { // 트리구조 생성을 위한 데이터 생성
 		for(var i = 0; i < source.length; i++) {			
 			if(source[i].O_PARENT == id) {
 				var obj = new Object();
@@ -96,7 +99,7 @@ $(document).ready(function() {
 		k_select(dataItem);
 	}
 	
-	function onCheck() {		
+	function onCheck() { // 체크박스 선택요소 조회
         var checkedNodes = [],
         	treeView = $("#treeview-right").data("kendoTreeView"),
             message;
@@ -111,7 +114,7 @@ $(document).ready(function() {
         console.log(message);
     }
 	
-	function checkedNodeIds(nodes, checkedNodes) {
+	function checkedNodeIds(nodes, checkedNodes) { // 조회 루프용 함수
         for (var i = 0; i < nodes.length; i++) {
             if (nodes[i].checked) {
                 checkedNodes.push(nodes[i].id);
@@ -119,7 +122,7 @@ $(document).ready(function() {
         }
     }
 	
-	$("#delete-node").click(function(e) {
+	$("#delete-node").click(function(e) { // 파일 및 폴더 삭제
 		var checkedNodes = [];
 		var treeView = $("#treeview-right").data("kendoTreeView");
 		var node;
@@ -145,9 +148,8 @@ $(document).ready(function() {
 	    }	    
 	});
 		
-	$("#append-node").click(function(e) {		
-		var name = $("#append-node-name").val();
-		
+	$("#append-node").click(function(e) { // 폴더 생성
+		var name = $("#append-node-name").val();		
 		var node = treeview.select();
 		var dataItem = treeview.dataItem(node);
 		treeview.expand(node);
@@ -174,8 +176,7 @@ $(document).ready(function() {
 		});		
 	});
 		
-	function k_select(e)
-	{
+	function k_select(e) { // 폴더 조회용 함수
 		$.post("http://10.0.0.46:8080/k_drive/kdrive_select?num="
 	    		+ e.id + "&table=" + user_num, function(list) {
    			var json = new Array();   			
@@ -201,17 +202,14 @@ $(document).ready(function() {
 	    });		
 	}
 
-	function onSelect(e) {	    
+	function onSelect(e) { // 선택된 폴더 내용 조회	    
 	    var element = treeview.dataItem(e.node);	    
 	    k_select(element);	    		
 	}
-	
-	function onDragStart(e) {}
-	
-	function onDrag(e) {
+		
+	function onDrag(e) { // 드래그시 마우스 커서 변경
 		var end = treeview.dataItem(e.dropTarget);		
-		if (e.statusClass.indexOf("insert") == 2 || end == undefined) {
-		    // deny the operation
+		if (e.statusClass.indexOf("insert") == 2 || end == undefined) {		    
 		    e.setStatusClass("k-i-cancel");		    		    
 		}		
 		else if(!e.originalEvent.ctrlKey && e.statusClass.indexOf("plus") == 2) {
@@ -228,7 +226,7 @@ $(document).ready(function() {
 			var start = treeview.dataItem(e.sourceNode);
 			var end = treeview.dataItem(e.dropTarget);
 						
-			if(e.originalEvent.ctrlKey) {
+			if(e.originalEvent.ctrlKey) { // 컨트롤키가 눌렸으면 복사
 				var node;
 				$.post("http://10.0.0.46:8080/k_drive/kdrive_copy?source=" + start.id
 					+ "&target=" + end.id + "&table=" + user_num, function(list) {					
@@ -260,7 +258,7 @@ $(document).ready(function() {
 				});
 				e.setValid(false);
 			}
-			else {
+			else { // 이동
 				var node;
 				$.post("http://10.0.0.46:8080/k_drive/kdrive_move?source=" + start.id
 						+ "&target=" + end.id + "&table=" + user_num, function() {
@@ -281,24 +279,23 @@ $(document).ready(function() {
 		}
 	}
 
-	document.getElementById('folder').onchange = function(e) {
+	document.getElementById('folder').onchange = function(e) { // 폴더 업로드
 		var node = treeview.select();
 		var dataItem = treeview.dataItem(node);
 		var files = e.target.files; // FileList		
 		var directory = new Array();
 		var formData = new FormData();
 		
-		for (var i = 0, f; f = files[i]; ++i) {			
-			//directory.push(files[i].webkitRelativePath);		
-			formData.append("file", files[i]);
-			formData.append("dir", files[i].webkitRelativePath)
+		for (var i = 0, f; f = files[i]; ++i) {
+			formData.append("file", files[i]); // 파일 데이터 추가
+			formData.append("dir", files[i].webkitRelativePath); // 폴더 경로 추가
 		}		
 		
 	    $.ajax({
 	        type: "POST",
 	        enctype: 'multipart/form-data',
 	        url: "http://10.0.0.46:8080/k_drive/upload_folder?table=" + user_num +
-	        		"&target=" + dataItem.id,// + "&dir=" + directory,
+	        		"&target=" + dataItem.id,
 	        data: formData,
 	        processData: false,
 	        contentType: false,
@@ -326,7 +323,7 @@ $(document).ready(function() {
 	    });				
 	}
 	
-	document.getElementById('file').onchange = function(e) {
+	document.getElementById('file').onchange = function(e) { // 파일 업로드
 		var node = treeview.select();
 		var dataItem = treeview.dataItem(node);
 		var files = e.target.files; // FileList		
@@ -360,7 +357,7 @@ $(document).ready(function() {
 	    });
 	}
 	
-	$("#select-down").click(function(e) {
+	$("#select-down").click(function(e) { // 체크된 요소 검색하여 작업
 		var checkedNodes = [];
 		var treeView = $("#treeview-right").data("kendoTreeView");
 		var node;
@@ -370,16 +367,12 @@ $(document).ready(function() {
 		
 	    if(checkedNodes.length <= 0) return;
 	    
+	    // 다중 다운로드 구현중(현재는 단일 다운로드만 가능)
 	    for (var i = 0; i < checkedNodes.length; i++) {
 	    	dataItem = treeview2.dataSource.get(checkedNodes[i]);
-	    	console.log(dataItem.filename + ":" + dataItem.dbfilename);
-	    	console.log(dataItem.filename + ":" + dataItem.dbfilename);
-	    	location.href = "/k_drive/down?filename="+dataItem.filename+"&dbname="+dataItem.dbfilename+"&table=" + user_num;
 	    		    	
-	    	/*$.get("http://10.0.0.46:8080/k_drive/down?filename=" + dataItem.filename + 
-	 			   "&dbname=" + dataItem.dbfilename + "&table=" + user_num, function(e) {
-	    		console.log("down success");	    				 		
-	 		});*/
+	    	location.href = "/k_drive/down?filename="+dataItem.filename+"&dbname="
+	    			+dataItem.dbfilename+"&table=" + user_num;	    	
 	    }
 	});
 });
